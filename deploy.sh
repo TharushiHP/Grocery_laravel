@@ -14,7 +14,10 @@ mkdir -p storage/framework/sessions
 mkdir -p storage/framework/views
 mkdir -p storage/app/public
 mkdir -p storage/documents
+mkdir -p database
 touch storage/logs/laravel.log
+
+# MySQL database will be provided by Railway service
 
 # Install PHP dependencies (production only)
 echo "Installing PHP dependencies..."
@@ -53,9 +56,6 @@ chmod -R 755 bootstrap/cache
 echo "Creating storage link..."
 php artisan storage:link || true
 
-# Seed database with sample data
-echo "Seeding database..."
-php artisan db:seed --force --class=DatabaseSeeder
-echo "Database seeding completed"
+# Database setup complete - seeding will happen during startup
 
 echo "=== Deployment preparation complete ==="

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 
-class SupplierController extends ApiController
+class ExternalSupplierController extends ApiController
 {
     protected $documentStore;
     

@@ -11,4 +11,4 @@ cmds = [
 cmds = []
 
 [start]
-cmd = 'php artisan migrate --force && php artisan db:seed --force --class=DatabaseSeeder && php artisan serve --host=0.0.0.0 --port=$PORT'
+cmd = 'chmod +x start.sh && ./start.sh'

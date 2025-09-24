@@ -5,6 +5,17 @@ set -e
 
 echo "=== Starting Laravel deployment ==="
 
+# Create necessary directories first
+echo "Creating required directories..."
+mkdir -p bootstrap/cache
+mkdir -p storage/logs
+mkdir -p storage/framework/cache
+mkdir -p storage/framework/sessions  
+mkdir -p storage/framework/views
+mkdir -p storage/app/public
+mkdir -p storage/documents
+touch storage/logs/laravel.log
+
 # Install PHP dependencies (production only)
 echo "Installing PHP dependencies..."
 composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
@@ -25,17 +36,8 @@ npm run build
 echo "Cleaning up node_modules..."
 rm -rf node_modules
 
-# Create storage directories
-echo "Setting up storage..."
-mkdir -p storage/logs
-mkdir -p storage/framework/cache
-mkdir -p storage/framework/sessions  
-mkdir -p storage/framework/views
-mkdir -p storage/app/public
-mkdir -p storage/documents
-touch storage/logs/laravel.log
-
 # Set proper permissions
+echo "Setting permissions..."
 chmod -R 755 storage
 chmod -R 755 bootstrap/cache
 

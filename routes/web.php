@@ -5,34 +5,6 @@ use App\Livewire\ProductCatalog;
 use App\Livewire\AdminProductManager;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\DB;
-
-// Debug route for Railway deployment
-Route::get('/debug', function () {
-    try {
-        $data = [
-            'laravel_version' => app()->version(),
-            'php_version' => PHP_VERSION,
-            'environment' => config('app.env'),
-            'debug_mode' => config('app.debug'),
-            'database_connection' => config('database.default'),
-            'app_key_set' => config('app.key') ? 'YES' : 'NO',
-        ];
-        
-        // Test database connection
-        try {
-            DB::connection()->getPdo();
-            $data['database_status'] = 'Connected';
-            $data['products_count'] = DB::table('products')->count();
-        } catch (Exception $e) {
-            $data['database_status'] = 'Failed: ' . $e->getMessage();
-        }
-        
-        return response()->json($data, 200, [], JSON_PRETTY_PRINT);
-    } catch (Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-});
 
 Route::get('/', ProductCatalog::class)->name('home');
 

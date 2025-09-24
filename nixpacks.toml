@@ -12,4 +12,4 @@ cmds = [
 cmds = []
 
 [start]
-cmd = "ls -la start.sh && chmod +x start.sh && bash start.sh"
+cmd = "php artisan migrate --force && (php artisan db:seed --force || echo 'Seeding skipped') && bash startup.sh"

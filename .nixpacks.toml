@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs-18_x", "npm-9_x"]
+
+[phases.install]
+cmds = [
+    "chmod +x deploy.sh",
+    "chmod +x startup.sh", 
+    "./deploy.sh"
+]
+
+[phases.build]
+
+[start]
+cmd = "./startup.sh"

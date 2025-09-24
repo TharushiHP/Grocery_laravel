@@ -1,0 +1,2 @@
+# Add this environment variable to Railway to force fresh database setup
+FORCE_FRESH_DATABASE=true

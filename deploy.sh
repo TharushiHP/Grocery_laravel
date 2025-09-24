@@ -32,8 +32,13 @@ npm ci --silent
 echo "Building assets..."
 npm run build
 
-# Ensure public/build directory has correct permissions
+# Ensure public/build directory has correct permissions and exists
+mkdir -p public/build
 chmod -R 755 public/build || true
+chmod -R 755 public/images || true
+
+# Ensure Laravel can detect the build manifest
+ls -la public/build/ || echo "Build directory contents check failed"
 
 # Remove node_modules after build to save space
 echo "Cleaning up node_modules..."
@@ -50,6 +55,6 @@ php artisan storage:link || true
 
 # Seed database with sample data
 echo "Seeding database..."
-php artisan db:seed --force || true
+php artisan migrate:fresh --seed --force || php artisan db:seed --force || true
 
 echo "=== Deployment preparation complete ==="

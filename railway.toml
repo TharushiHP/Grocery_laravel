@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "echo 'Starting Laravel Debug Mode...' && php -v && php artisan --version && php artisan config:clear && echo 'Testing database connection...' && php artisan migrate:status || echo 'Migration status failed' && php artisan migrate --force || echo 'Migration failed' && echo 'Starting server...' && php artisan serve --host=0.0.0.0 --port=$PORT"
-healthcheckPath = "/debug"
+startCommand = "echo 'Starting PHP server directly...' && php -v && echo 'Current directory:' && pwd && echo 'Files in root:' && ls -la && echo 'Files in public:' && ls -la public/ && php -S 0.0.0.0:$PORT -t public/"
+healthcheckPath = "/test.php"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

@@ -56,6 +56,10 @@ chmod -R 755 bootstrap/cache
 echo "Creating storage link..."
 php artisan storage:link || true
 
+# Generate application key if not present
+echo "Generating application key..."
+php artisan key:generate --force --no-interaction || echo "Key generation failed"
+
 # Startup script is already included as startup.sh file
 echo "Startup script ready"
 chmod +x startup.sh || echo "Could not set executable permissions"

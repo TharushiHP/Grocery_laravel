@@ -1,0 +1,46 @@
+# Railway Environment Variables - Copy these to your Railway dashboard
+
+APP_NAME=Grocery Store
+APP_ENV=production
+APP_KEY=base64:MNbv0nrOxeaadQi3ErM0LuaCW2Y7Wd2ij7K9Ce1QVFQ=
+APP_DEBUG=false
+APP_URL=https://your-app-name.up.railway.app
+
+LOG_CHANNEL=stack
+LOG_LEVEL=error
+
+# Database (Railway will provide these automatically when you add PostgreSQL)
+DB_CONNECTION=pgsql
+DB_HOST=${{PGHOST}}
+DB_PORT=${{PGPORT}}
+DB_DATABASE=${{PGDATABASE}}
+DB_USERNAME=${{PGUSER}}
+DB_PASSWORD=${{PGPASSWORD}}
+
+# Cache and Session
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+QUEUE_CONNECTION=sync
+
+# Mail (optional - you can add later)
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS=hello@grocerystore.com
+MAIL_FROM_NAME="Grocery Store"
+
+# NoSQL Document Store
+DOCUMENT_STORE_PATH=storage/documents
+DOCUMENT_STORE_ENABLED=true
+
+# API Features
+EXTERNAL_SUPPLIER_API_ENABLED=true
+RECOMMENDATION_ENGINE_ENABLED=true
+AI_RECOMMENDATION_MODEL=collaborative_filtering
+
+# Security
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
+
+# Sanctum (update with your actual Railway domain)
+SANCTUM_STATEFUL_DOMAINS=your-app-name.up.railway.app
+SESSION_DOMAIN=.your-app-name.up.railway.app

@@ -4,6 +4,7 @@ nixPkgs = ['php82', 'php82Packages.composer', 'nodejs-18_x', 'npm-9_x']
 [phases.install]
 cmds = [
     'chmod +x deploy.sh',
+    'chmod +x start.sh',
     './deploy.sh'
 ]
 
@@ -11,4 +12,4 @@ cmds = [
 cmds = []
 
 [start]
-cmd = 'chmod +x start.sh && ./start.sh'
+cmd = "ls -la start.sh && chmod +x start.sh && bash start.sh"

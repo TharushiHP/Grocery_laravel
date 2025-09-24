@@ -1,12 +1,15 @@
 #!/bin/bash
 set -e
 
-echo "=== Starting Laravel Application ==="
+echo "=== Starting Laravel Application with Custom Script ==="
+echo "Current directory: $(pwd)"
+echo "PHP version: $(php --version | head -n1)"
 
 # Show environment info
 echo "Environment: $APP_ENV"
 echo "Database: $DB_CONNECTION"
 echo "Host: $DB_HOST"
+echo "Port: $PORT"
 
 # Wait for database connection
 echo "Waiting for database connection..."

@@ -3,14 +3,8 @@ nixPkgs = ['php82', 'php82Packages.composer', 'nodejs-18_x', 'npm-9_x']
 
 [phases.install]
 cmds = [
-    'composer install --optimize-autoloader --no-dev',
-    'npm ci',
-    'npm run build'
-]
-
-[phases.build]
-cmds = [
-    'php artisan storage:link || true'
+    'chmod +x deploy.sh',
+    './deploy.sh'
 ]
 
 [start]

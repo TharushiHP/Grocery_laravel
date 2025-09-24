@@ -18,6 +18,22 @@
             margin: 0;
             padding: 0;
         }
+        /* Fix for large icons */
+        svg, img.icon {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+        }
+        .hero-icon {
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+        /* Ensure icons in cards are properly sized */
+        .product-card svg,
+        .cart-icon svg,
+        .nav-icon svg {
+            width: 1.25rem !important;
+            height: 1.25rem !important;
+        }
     </style>
 </head>
 <body style="font-family: 'Inter', sans-serif; background: linear-gradient(to bottom, #f3f4f6, #ffffff); margin: 0; padding: 0;">

@@ -55,6 +55,7 @@ php artisan storage:link || true
 
 # Seed database with sample data
 echo "Seeding database..."
-php artisan migrate:fresh --seed --force || php artisan db:seed --force || true
+php artisan db:seed --force --class=DatabaseSeeder
+echo "Database seeding completed"
 
 echo "=== Deployment preparation complete ==="

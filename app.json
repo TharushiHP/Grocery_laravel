@@ -1,0 +1,68 @@
+{
+  "name": "grocery-laravel",
+  "description": "Laravel 12 Grocery Store Application with Livewire, Jetstream, Sanctum API, and NoSQL Integration",
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_KEY": {
+      "required": true,
+      "description": "Generate with: php artisan key:generate --show"
+    },
+    "APP_URL": {
+      "required": true,
+      "description": "Your production URL (e.g., https://your-app.herokuapp.com)"
+    },
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": {
+      "required": true,
+      "description": "Database host (use ClearDB or JawsDB add-on)"
+    },
+    "DB_PORT": "3306",
+    "DB_DATABASE": {
+      "required": true,
+      "description": "Database name"
+    },
+    "DB_USERNAME": {
+      "required": true,
+      "description": "Database username"
+    },
+    "DB_PASSWORD": {
+      "required": true,
+      "description": "Database password"
+    },
+    "MAIL_MAILER": "smtp",
+    "MAIL_HOST": "smtp.mailtrap.io",
+    "MAIL_PORT": "2525",
+    "MAIL_USERNAME": {
+      "required": false,
+      "description": "Email service username"
+    },
+    "MAIL_PASSWORD": {
+      "required": false,
+      "description": "Email service password"
+    },
+    "CACHE_DRIVER": "redis",
+    "SESSION_DRIVER": "redis",
+    "QUEUE_CONNECTION": "redis",
+    "REDIS_URL": {
+      "required": false,
+      "description": "Redis connection URL (use Heroku Redis add-on)"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": [
+    "cleardb:ignite",
+    "heroku-redis:hobby-dev"
+  ],
+  "buildpacks": [
+    "heroku/php"
+  ],
+  "scripts": {
+    "postdeploy": "php artisan migrate --force"
+  }
+}

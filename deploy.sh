@@ -32,6 +32,9 @@ npm ci --silent
 echo "Building assets..."
 npm run build
 
+# Ensure public/build directory has correct permissions
+chmod -R 755 public/build || true
+
 # Remove node_modules after build to save space
 echo "Cleaning up node_modules..."
 rm -rf node_modules
@@ -44,5 +47,9 @@ chmod -R 755 bootstrap/cache
 # Create storage link
 echo "Creating storage link..."
 php artisan storage:link || true
+
+# Seed database with sample data
+echo "Seeding database..."
+php artisan db:seed --force || true
 
 echo "=== Deployment preparation complete ==="

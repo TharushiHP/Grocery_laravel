@@ -4,12 +4,8 @@ nixPkgs = ['php82', 'php82Packages.composer', 'nodejs-18_x', 'npm-9_x']
 [phases.install]
 cmds = [
     'chmod +x deploy.sh',
-    'chmod +x start.sh',
     './deploy.sh'
 ]
 
 [phases.build]
 cmds = []
-
-[start]
-cmd = "mkdir -p bootstrap/cache storage/logs storage/framework/{cache,sessions,views} storage/app/public && php artisan migrate --force && (php artisan db:seed --force || echo 'Seeding completed') && bash startup.sh"

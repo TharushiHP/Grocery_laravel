@@ -8,10 +8,21 @@ use App\Http\Controllers\AdminController;
 
 // Health check endpoint for Railway
 Route::get('/health', function () {
+    try {
+        // Test database connection
+        \DB::connection()->getPdo();
+        $dbStatus = 'connected';
+    } catch (\Exception $e) {
+        $dbStatus = 'disconnected: ' . $e->getMessage();
+    }
+    
     return response()->json([
         'status' => 'ok',
         'timestamp' => now(),
-        'service' => 'Laravel Grocery Cart'
+        'service' => 'Laravel Grocery Cart',
+        'database' => $dbStatus,
+        'php_version' => PHP_VERSION,
+        'laravel_version' => app()->version()
     ]);
 });
 

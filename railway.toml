@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "mkdir -p bootstrap/cache storage/logs storage/framework/{cache,sessions,views} storage/app/public && chmod -R 755 bootstrap/cache storage && php artisan migrate --force && (php artisan db:seed --force || echo 'Seeding completed') && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT"
+startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

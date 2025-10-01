@@ -33,6 +33,16 @@ else
 fi
 
 # Create storage link
+echo "Creating storage link..."
+php artisan storage:link || echo "Storage link already exists"
+
+# Clear and cache configurations for production
+echo "Optimizing for production..."
+php artisan config:cache || echo "Config cache skipped"
+php artisan route:cache || echo "Route cache skipped"
+php artisan view:cache || echo "View cache skipped"
+
+echo "=== Deployment Complete ==="
 php artisan storage:link || true
 
 echo "=== Deployment Complete ==="

@@ -23,9 +23,14 @@ echo "Setting permissions..."
 chmod -R 755 storage bootstrap/cache
 chmod -R 755 public/build || true
 
-# Generate app key
-echo "Generating application key..."
-php artisan key:generate --force || true
+# Skip key generation if APP_KEY exists
+echo "Checking application key..."
+if [ -z "$APP_KEY" ]; then
+    echo "Generating application key..."
+    php artisan key:generate --force
+else
+    echo "APP_KEY already set, skipping generation"
+fi
 
 # Create storage link
 php artisan storage:link || true

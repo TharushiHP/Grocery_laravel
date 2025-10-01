@@ -27,11 +27,16 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
+# Create required directories and set permissions
+RUN mkdir -p bootstrap/cache storage/logs storage/framework/{cache,sessions,views} storage/app/public \
+    && chown -R www-data:www-data bootstrap/cache storage \
+    && chmod -R 755 bootstrap/cache storage
+
 # Install application dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate application key
-RUN php artisan key:generate
+# Generate application key (skip if APP_KEY already exists)
+RUN php artisan key:generate --force || echo "Key generation skipped"
 
 # Cache configuration and routes
 RUN php artisan config:cache \

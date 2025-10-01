@@ -14,7 +14,7 @@ Route::get('/health', function () {
         'service' => 'Laravel Grocery Cart',
         'php_version' => PHP_VERSION,
         'laravel_version' => app()->version(),
-        'deployment_time' => 'October 1, 2025 - Server running test'
+        'deployment_time' => 'October 2, 2025 - Database connected'
     ]);
 });
 

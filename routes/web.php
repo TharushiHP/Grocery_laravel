@@ -22,7 +22,14 @@ Route::get('/health', function () {
 Route::get('/health/database', function () {
     try {
         \DB::connection()->getPdo();
-        return response()->json(['database' => 'connected']);
+        $productCount = \App\Models\Product::count();
+        $userCount = \App\Models\User::count();
+        return response()->json([
+            'database' => 'connected',
+            'products' => $productCount,
+            'users' => $userCount,
+            'database_name' => \DB::connection()->getDatabaseName()
+        ]);
     } catch (\Exception $e) {
         return response()->json(['database' => 'disconnected: ' . $e->getMessage()], 500);
     }

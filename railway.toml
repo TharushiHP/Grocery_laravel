@@ -8,6 +8,9 @@ healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 
 [env]
+# Database configuration
+DB_DATABASE = "grocery_laravel"
+
 # Production optimizations
 APP_ENV = "production"
 APP_DEBUG = "false"

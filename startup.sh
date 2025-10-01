@@ -15,21 +15,23 @@ echo "DB_CONNECTION: $DB_CONNECTION"
 # Test basic PHP functionality
 echo "PHP Version: $(php --version | head -n1)"
 
-# Check if we can connect to database
+# Check if we can connect to database (using Railway environment variables)
 echo "Testing database connection..."
 php -r "
 try {
-    \$pdo = new PDO('mysql:host=' . getenv('MYSQLHOST') . ';port=' . getenv('MYSQLPORT') . ';dbname=' . getenv('MYSQLDATABASE'), getenv('MYSQLUSER'), getenv('MYSQLPASSWORD'));
+    \$host = getenv('DB_HOST') ?: 'localhost';
+    \$port = getenv('DB_PORT') ?: '3306';
+    \$database = getenv('DB_DATABASE') ?: 'railway';
+    \$username = getenv('DB_USERNAME') ?: 'root';
+    \$password = getenv('DB_PASSWORD') ?: '';
+    
+    \$pdo = new PDO(\"mysql:host=\$host;port=\$port;dbname=\$database\", \$username, \$password);
     echo 'Database connection successful!' . PHP_EOL;
 } catch (Exception \$e) {
     echo 'Database connection failed: ' . \$e->getMessage() . PHP_EOL;
     echo 'Continuing anyway...' . PHP_EOL;
 }
 "
-
-# Run Laravel migrations
-echo "Running migrations..."
-php artisan migrate --force || echo "Migrations failed, continuing..."
 
 # Start Laravel development server
 echo "Starting Laravel server on 0.0.0.0:$PORT"

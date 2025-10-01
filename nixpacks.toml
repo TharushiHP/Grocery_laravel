@@ -12,4 +12,4 @@ cmds = [
 cmds = []
 
 [start]
-cmd = "php artisan migrate --force && (php artisan db:seed --force || echo 'Seeding skipped') && bash startup.sh"
+cmd = "mkdir -p bootstrap/cache storage/logs storage/framework/{cache,sessions,views} storage/app/public && php artisan migrate --force && (php artisan db:seed --force || echo 'Seeding completed') && bash startup.sh"

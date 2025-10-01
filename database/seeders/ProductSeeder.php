@@ -13,6 +13,9 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        // Clear existing products to avoid duplicates
+        DB::table('products')->truncate();
+        
         DB::table('products')->insert([
             ['id' => 1, 'name' => 'Carrots', 'description' => 'Fresh Sri Lankan carrots', 'price' => 120.00, 'category' => 'Vegetables', 'quantity' => '1 kg', 'image' => 'carrots.jpg', 'created_at' => now(), 'updated_at' => now()],
             ['id' => 2, 'name' => 'Beans', 'description' => 'Green beans from Nuwara Eliya', 'price' => 90.00, 'category' => 'Vegetables', 'quantity' => '500 g', 'image' => 'beans.jpg', 'created_at' => now(), 'updated_at' => now()],

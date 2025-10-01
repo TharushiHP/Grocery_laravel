@@ -95,11 +95,67 @@
             </div>
         </header>
 
+        <!-- Toast Notifications -->
+        @if(session('success'))
+            <div id="success-toast" class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div id="error-toast" class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            </div>
+        @endif
+
         <!-- Main Content -->
         <main>
             {{ $slot }}
         </main>
     </div>
+
+    <!-- Toast Notification Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show success toast
+            const successToast = document.getElementById('success-toast');
+            if (successToast) {
+                setTimeout(() => {
+                    successToast.classList.remove('translate-x-full');
+                    successToast.classList.add('translate-x-0');
+                }, 100);
+                
+                setTimeout(() => {
+                    successToast.classList.add('translate-x-full');
+                    successToast.classList.remove('translate-x-0');
+                }, 5000);
+            }
+            
+            // Show error toast
+            const errorToast = document.getElementById('error-toast');
+            if (errorToast) {
+                setTimeout(() => {
+                    errorToast.classList.remove('translate-x-full');
+                    errorToast.classList.add('translate-x-0');
+                }, 100);
+                
+                setTimeout(() => {
+                    errorToast.classList.add('translate-x-full');
+                    errorToast.classList.remove('translate-x-0');
+                }, 5000);
+            }
+        });
+    </script>
 
     @livewireScripts
 </body>

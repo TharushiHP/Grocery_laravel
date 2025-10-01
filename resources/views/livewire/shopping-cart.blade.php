@@ -6,9 +6,9 @@
                 onmouseover="this.style.color='#bbf7d0'; this.style.textDecoration='underline';"
                 onmouseout="this.style.color='white'; this.style.textDecoration='none';">
             Cart
-            @if($itemCount > 0)
+            @if($this->itemCount > 0)
                 <span style="margin-left: 0.25rem; background-color: #ef4444; color: white; font-size: 0.75rem; font-weight: bold; border-radius: 50%; height: 16px; width: 16px; display: inline-flex; align-items: center; justify-content: center;">
-                    {{ $itemCount }}
+                    {{ $this->itemCount }}
                 </span>
             @endif
         </button>
@@ -44,7 +44,7 @@
                             <p class="text-gray-400 text-sm mt-1">Add some items to get started!</p>
                         </div>
                     @else
-                        @foreach($cartItems as $productId => $item)
+                        @foreach($cartItems as $index => $item)
                             <div style="padding: 1rem; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 1rem; transition: background-color 0.3s;"
                                  onmouseover="this.style.backgroundColor='#f9fafb'"
                                  onmouseout="this.style.backgroundColor='white'">
@@ -71,19 +71,19 @@
 
                                 <!-- Quantity Controls -->
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <button wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] - 1 }})" 
+                                    <button wire:click="updateQuantity({{ $index }}, {{ $item['quantity'] - 1 }})" 
                                             style="width: 1.5rem; height: 1.5rem; background-color: #ef4444; color: white; border: none; border-radius: 0.25rem; font-size: 0.875rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s;"
                                             onmouseover="this.style.backgroundColor='#dc2626'"
                                             onmouseout="this.style.backgroundColor='#ef4444'">-</button>
                                     <span style="font-size: 0.875rem; font-weight: 500; width: 2rem; text-align: center; color: #1f2937;">{{ $item['quantity'] }}</span>
-                                    <button wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] + 1 }})" 
+                                    <button wire:click="updateQuantity({{ $index }}, {{ $item['quantity'] + 1 }})" 
                                             style="width: 1.5rem; height: 1.5rem; background-color: #10b981; color: white; border: none; border-radius: 0.25rem; font-size: 0.875rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s;"
                                             onmouseover="this.style.backgroundColor='#059669'"
                                             onmouseout="this.style.backgroundColor='#10b981'">+</button>
                                 </div>
 
                                 <!-- Remove Button -->
-                                <button wire:click="removeFromCart({{ $productId }})" 
+                                <button wire:click="removeItem({{ $index }})" 
                                         style="color: #ef4444; padding: 0.25rem; border: none; background: none; border-radius: 0.25rem; cursor: pointer; transition: color 0.3s;"
                                         onmouseover="this.style.color='#b91c1c'"
                                         onmouseout="this.style.color='#ef4444'">
@@ -101,7 +101,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <span style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">Total:</span>
                             <span style="font-size: 1.25rem; font-weight: bold; color: #16a34a;">
-                                Rs. {{ number_format($total, 2) }}
+                                Rs. {{ number_format($this->total, 2) }}
                             </span>
                         </div>
                         
@@ -112,7 +112,8 @@
                                     onmouseout="this.style.backgroundColor='#6b7280'">
                                 Clear Cart
                             </button>
-                            <button onclick="window.location.href='{{ route('checkout') }}'" 
+                            <button wire:click="checkout" 
+                                    onclick="console.log('Checkout button clicked')"
                                     style="flex: 1; background-color: #16a34a; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.3s;"
                                     onmouseover="this.style.backgroundColor='#15803d'"
                                     onmouseout="this.style.backgroundColor='#16a34a'">
@@ -125,3 +126,14 @@
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('livewire:initialized', () => {
+    Livewire.on('checkout-failed', (event) => {
+        console.log('Checkout failed:', event);
+        const reason = event[0].reason;
+        const message = event[0].message || '';
+        alert(`Checkout failed: ${reason}. ${message}`);
+    });
+});
+</script>

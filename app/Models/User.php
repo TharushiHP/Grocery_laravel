@@ -9,10 +9,83 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\NewAccessToken;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
+    
+    /**
+     * Create a new personal access token with advanced scopes.
+     *
+     * @param string $name
+     * @param array $abilities
+     * @param \DateTime|null $expiresAt
+     * @return \Laravel\Sanctum\NewAccessToken
+     */
+    public function createToken(string $name, array $abilities = ['*'], \DateTime $expiresAt = null)
+    {
+        $token = $this->tokens()->create([
+            'name' => $name,
+            'token' => hash('sha256', $plainTextToken = Str::random(40)),
+            'abilities' => $abilities,
+            'expires_at' => $expiresAt,
+            'last_used_at' => now(),
+            'device_id' => request()->header('X-Device-ID'),
+            'device_name' => request()->header('X-Device-Name', 'Unknown Device'),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ]);
+
+        return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
+    }
+    
+    /**
+     * Get active tokens for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getActiveTokens()
+    {
+        return $this->tokens()
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                      ->orWhere('expires_at', '>', now());
+            })
+            ->orderBy('last_used_at', 'desc')
+            ->get();
+    }
+    
+    /**
+     * Revoke all tokens for a specific device.
+     *
+     * @param string $deviceId
+     * @return int
+     */
+    public function revokeTokensForDevice($deviceId)
+    {
+        return $this->tokens()
+            ->where('device_id', $deviceId)
+            ->delete();
+    }
+    
+    /**
+     * Check if user has permission for a specific ability.
+     *
+     * @param string $ability
+     * @return bool
+     */
+    public function hasAbility($ability)
+    {
+        $token = $this->currentAccessToken();
+        
+        if (!$token) {
+            return false;
+        }
+        
+        return $token->can($ability);
+    }
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -78,6 +151,9 @@ class User extends Authenticatable
 
     /**
      * Check if user is admin
+     */
+    /**
+     * Check if the user has admin role.
      */
     public function isAdmin()
     {

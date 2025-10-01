@@ -12,7 +12,15 @@ class ProductCatalog extends Component
 
     public $search = '';
     public $selectedCategory = '';
-    public $perPage = 12;
+    public $sortBy = 'name';
+    public $sortOrder = 'asc';
+    
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'selectedCategory' => ['except' => ''],
+        'sortBy' => ['except' => 'name'],
+        'sortOrder' => ['except' => 'asc'],
+    ];
 
     public function updatingSearch()
     {
@@ -24,52 +32,58 @@ class ProductCatalog extends Component
         $this->resetPage();
     }
 
-    public function addToCart($productId)
+    public function sortBy($field)
     {
-        // Check if user is authenticated
-        if (!auth()->check()) {
-            // Just return early - we'll handle the popup in the frontend
-            return;
+        if ($this->sortBy === $field) {
+            $this->sortOrder = $this->sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortOrder = 'asc';
+        }
+    }
+
+    public function clearFilters()
+    {
+        $this->search = '';
+        $this->selectedCategory = '';
+        $this->sortBy = 'name';
+        $this->sortOrder = 'asc';
+        $this->resetPage();
+    }
+
+    public function getProducts()
+    {
+        $query = Product::query();
+
+        if ($this->search) {
+            $query->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
         }
 
-        $product = Product::findOrFail($productId);
-        
-        $cart = session()->get('cart', []);
-        
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity']++;
-        } else {
-            $cart[$productId] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => 1,
-                'image' => $product->image ?? ''
-            ];
+        if ($this->selectedCategory) {
+            $query->where('category', $this->selectedCategory);
         }
-        
-        session()->put('cart', $cart);
-        
-        $this->dispatch('cart-updated');
-        
-        session()->flash('message', $product->name . ' added to cart!');
+
+        return $query->orderBy($this->sortBy, $this->sortOrder)
+                     ->paginate(12);
+    }
+
+    public function getCategories()
+    {
+        return Product::distinct()->pluck('category')->filter()->sort();
+    }
+
+    public function addToCart($productId, $quantity = 1)
+    {
+        $this->dispatch('add-to-cart', $productId, $quantity);
+        session()->flash('success', 'Item added to cart!');
     }
 
     public function render()
     {
-        $products = Product::query()
-            ->when($this->search, fn($query) => $query->search($this->search))
-            ->when($this->selectedCategory, fn($query) => $query->byCategory($this->selectedCategory))
-            ->paginate($this->perPage);
-
-        $categories = Product::select('category')
-            ->distinct()
-            ->whereNotNull('category')
-            ->pluck('category');
-
         return view('livewire.product-catalog', [
-            'products' => $products,
-            'categories' => $categories,
+            'products' => $this->getProducts(),
+            'categories' => $this->getCategories()
         ]);
     }
 }

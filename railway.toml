@@ -2,7 +2,24 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
-healthcheckPath = "/health.php"
-healthcheckTimeout = 120
-restartPolicyType = "ON_FAILURE" 
+startCommand = "php artisan config:clear && php artisan cache:clear && php artisan view:clear && php artisan route:clear && php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[env]
+# Production optimizations
+APP_ENV = "production"
+APP_DEBUG = "false"
+LOG_CHANNEL = "stderr"
+LOG_LEVEL = "info"
+
+# Performance settings
+CACHE_DRIVER = "redis"
+SESSION_DRIVER = "redis"  
+QUEUE_CONNECTION = "redis"
+
+# Security
+SESSION_SECURE_COOKIE = "true"
+SESSION_HTTP_ONLY = "true"
+SESSION_SAME_SITE = "strict" 

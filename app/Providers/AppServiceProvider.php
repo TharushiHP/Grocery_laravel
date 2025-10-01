@@ -11,10 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register DocumentStore as singleton for NoSQL-like functionality
-        $this->app->singleton(\App\Services\DocumentStore::class, function ($app) {
-            return new \App\Services\DocumentStore();
-        });
+        //
     }
 
     /**

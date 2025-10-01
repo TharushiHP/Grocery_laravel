@@ -81,6 +81,21 @@
                 @endif
             @endif
         </div>
+
+        <!-- Username -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="username" value="{{ __('Username') }}" />
+            <x-input id="username" type="text" class="mt-1 block w-full" wire:model="state.username" required autocomplete="username" />
+            <x-input-error for="username" class="mt-2" />
+        </div>
+
+        <!-- Phone Number -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="phone_number" value="{{ __('Phone Number') }}" />
+            <x-input id="phone_number" type="tel" class="mt-1 block w-full" wire:model="state.phone_number" autocomplete="tel" />
+            <x-input-error for="phone_number" class="mt-2" />
+            <p class="mt-1 text-sm text-gray-500">{{ __('Used for delivery updates and support.') }}</p>
+        </div>
     </x-slot>
 
     <x-slot name="actions">

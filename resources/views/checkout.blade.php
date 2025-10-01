@@ -10,7 +10,7 @@
                     <p class="text-gray-600 text-lg">Review your items and provide delivery details</p>
                 </div>
                 
-                @if(session('cart') && count(session('cart')) > 0)
+                @if($cartItems && count($cartItems) > 0)
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Enhanced Order Summary -->
                         <div class="lg:order-2">
@@ -23,10 +23,12 @@
                                 </h2>
                                 
                                 <div class="space-y-4 max-h-64 overflow-y-auto">
-                                    @foreach(session('cart') as $productId => $item)
+                                    @foreach($cartItems as $productId => $item)
                                         @if(is_array($item) && isset($item['name'], $item['price'], $item['quantity']))
                                             @php 
-                                                $subtotal = $item['price'] * $item['quantity'];
+                                                $price = is_numeric($item['price']) ? (float)$item['price'] : 0;
+                                                $quantity = is_numeric($item['quantity']) ? (int)$item['quantity'] : 0;
+                                                $subtotal = $price * $quantity;
                                             @endphp
                                             <div class="flex items-center space-x-4 p-4 bg-gray-50/80 rounded-2xl">
                                                 <!-- Product Image -->
@@ -61,9 +63,7 @@
                                     <div class="flex justify-between items-center">
                                         <span class="text-2xl font-bold text-gray-800">Total:</span>
                                         <span class="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                            Rs. {{ number_format(array_sum(array_map(function($item) { 
-                                                return is_array($item) && isset($item['price'], $item['quantity']) ? $item['price'] * $item['quantity'] : 0; 
-                                            }, session('cart', []))), 2) }}
+                                            Rs. {{ number_format($total, 2) }}
                                         </span>
                                     </div>
                                 </div>
@@ -244,4 +244,7 @@
             </div>
         </div>
     </div>
+
+    <!-- Order Success JavaScript -->
+    <script src="{{ asset('js/order-success.js') }}"></script>
 </x-layouts.app>

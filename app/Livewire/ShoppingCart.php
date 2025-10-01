@@ -4,98 +4,155 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderDetail;
 
 class ShoppingCart extends Component
 {
     public $cartItems = [];
     public $isOpen = false;
-
+    
     public function mount()
     {
-        $this->refreshCart();
+        $this->loadCart();
     }
 
     #[On('add-to-cart')]
-    public function addToCart($productId)
+    public function addToCart($productId, $quantity = 1)
     {
-        // Double-check authentication
         if (!auth()->check()) {
+            session()->flash('error', 'Please login to add items to cart');
             return;
         }
 
         $product = Product::find($productId);
         
         if (!$product) {
+            session()->flash('error', 'Product not found');
             return;
         }
 
-        $cartItems = session()->get('cart', []);
-        
-        if (isset($cartItems[$productId])) {
-            $cartItems[$productId]['quantity']++;
+        if ($product->quantity < $quantity) {
+            session()->flash('error', 'Insufficient stock available');
+            return;
+        }
+
+        $existingItemIndex = collect($this->cartItems)->search(function ($item) use ($productId) {
+            return $item['product_id'] == $productId;
+        });
+
+        if ($existingItemIndex !== false) {
+            $this->cartItems[$existingItemIndex]['quantity'] = (int)$this->cartItems[$existingItemIndex]['quantity'] + (int)$quantity;
         } else {
-            $cartItems[$productId] = [
-                'id' => $product->id,
+            $this->cartItems[] = [
+                'product_id' => (int)$product->id,
                 'name' => $product->name,
-                'price' => $product->price,
-                'image' => $product->image ?? '',
-                'quantity' => 1,
+                'price' => (float)$product->price,
+                'quantity' => (int)$quantity,
+                'image' => $product->image
             ];
         }
 
-        session()->put('cart', $cartItems);
-        $this->cartItems = $cartItems;
-        
+        $this->saveCart();
+        session()->flash('success', 'Product added to cart!');
         $this->dispatch('cart-updated');
     }
 
-    #[On('cart-updated')]
-    public function refreshCart()
+    public function removeItem($index)
     {
-        if (auth()->check()) {
-            $this->cartItems = session()->get('cart', []);
-        } else {
-            $this->cartItems = [];
-        }
-    }
-
-    public function removeFromCart($productId)
-    {
-        $cartItems = session()->get('cart', []);
-        unset($cartItems[$productId]);
-        session()->put('cart', $cartItems);
-        $this->cartItems = $cartItems;
-        
+        unset($this->cartItems[$index]);
+        $this->cartItems = array_values($this->cartItems);
+        $this->saveCart();
         $this->dispatch('cart-updated');
     }
 
-    public function updateQuantity($productId, $quantity)
+    public function updateQuantity($index, $quantity)
     {
+        $quantity = (int)$quantity;
         if ($quantity <= 0) {
-            $this->removeFromCart($productId);
+            $this->removeItem($index);
             return;
         }
 
-        $cartItems = session()->get('cart', []);
-        if (isset($cartItems[$productId])) {
-            $cartItems[$productId]['quantity'] = $quantity;
-            session()->put('cart', $cartItems);
-            $this->cartItems = $cartItems;
-            
-            $this->dispatch('cart-updated');
-        }
+        $this->cartItems[$index]['quantity'] = $quantity;
+        $this->saveCart();
+        $this->dispatch('cart-updated');
     }
 
-    public function toggleCart()
+    public function clearCart()
     {
-        $this->isOpen = !$this->isOpen;
+        $this->cartItems = [];
+        $this->saveCart();
+        // Also clear checkout_cart session
+        session()->forget(['cart', 'checkout_cart']);
+        $this->dispatch('cart-updated');
+    }
+
+    public function checkout()
+    {
+        \Log::info('Checkout method called');
+        \Log::info('User authenticated:', ['authenticated' => auth()->check()]);
+        \Log::info('Cart items count:', ['count' => count($this->cartItems)]);
+        
+        if (!auth()->check()) {
+            session()->flash('error', 'Please login to checkout');
+            \Log::info('Checkout failed: User not authenticated');
+            $this->dispatch('checkout-failed', ['reason' => 'not_authenticated']);
+            return;
+        }
+
+        if (empty($this->cartItems)) {
+            session()->flash('error', 'Your cart is empty');
+            \Log::info('Checkout failed: Cart is empty');
+            $this->dispatch('checkout-failed', ['reason' => 'empty_cart']);
+            return;
+        }
+
+        \Log::info('Cart items:', $this->cartItems);
+        \Log::info('Cart items debug:', [
+            'items' => array_map(function($item) {
+                return [
+                    'product_id' => $item['product_id'] . ' (' . gettype($item['product_id']) . ')',
+                    'price' => $item['price'] . ' (' . gettype($item['price']) . ')',
+                    'quantity' => $item['quantity'] . ' (' . gettype($item['quantity']) . ')'
+                ];
+            }, $this->cartItems)
+        ]);
+        \Log::info('Total amount:', ['total' => $this->getTotal()]);
+
+        // Store cart items in session for checkout form
+        session()->put('checkout_cart', $this->cartItems);
+        
+        \Log::info('Redirecting to checkout form');
+        
+        // Redirect to checkout form instead of creating order directly
+        return $this->redirect(route('checkout'), navigate: true);
     }
 
     public function getTotal()
     {
         return collect($this->cartItems)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
+            $price = is_numeric($item['price']) ? (float)$item['price'] : 0;
+            $quantity = is_numeric($item['quantity']) ? (int)$item['quantity'] : 0;
+            return $price * $quantity;
+        });
+    }
+
+    #[Computed]
+    public function itemCount()
+    {
+        return collect($this->cartItems)->sum('quantity');
+    }
+
+    #[Computed]
+    public function total()
+    {
+        return collect($this->cartItems)->sum(function ($item) {
+            $price = is_numeric($item['price']) ? (float)$item['price'] : 0;
+            $quantity = is_numeric($item['quantity']) ? (int)$item['quantity'] : 0;
+            return $price * $quantity;
         });
     }
 
@@ -104,19 +161,23 @@ class ShoppingCart extends Component
         return collect($this->cartItems)->sum('quantity');
     }
 
-    public function clearCart()
+    public function toggleCart()
     {
-        session()->forget('cart');
-        $this->cartItems = [];
-        
-        $this->dispatch('cart-updated');
+        $this->isOpen = !$this->isOpen;
+    }
+
+    private function loadCart()
+    {
+        $this->cartItems = session()->get('cart', []);
+    }
+
+    private function saveCart()
+    {
+        session()->put('cart', $this->cartItems);
     }
 
     public function render()
     {
-        return view('livewire.shopping-cart', [
-            'total' => $this->getTotal(),
-            'itemCount' => $this->getItemCount(),
-        ]);
+        return view('livewire.shopping-cart');
     }
 }

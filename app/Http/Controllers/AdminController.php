@@ -10,21 +10,27 @@ use App\Models\Order;
 
 class AdminController extends Controller
 {
+    /**
+     * Show the admin login form.
+     */
     public function showLoginForm()
     {
         // If already logged in as admin, redirect to dashboard
         if (Auth::check() && Auth::user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        
+
         // If logged in as regular user, logout first
         if (Auth::check() && !Auth::user()->isAdmin()) {
             Auth::logout();
         }
-        
+
         return view('admin.login');
     }
 
+    /**
+     * Handle admin login
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -34,7 +40,7 @@ class AdminController extends Controller
 
         // Find the user by email first
         $user = User::where('email', $request->email)->first();
-        
+
         // Check if user exists and has admin role
         if (!$user || !$user->isAdmin()) {
             return back()->withErrors([
@@ -45,8 +51,6 @@ class AdminController extends Controller
         // Attempt authentication only if user is admin
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $request->session()->regenerate();
-            
-            // Force redirect to admin dashboard
             return redirect('/admin/dashboard');
         }
 
@@ -55,6 +59,9 @@ class AdminController extends Controller
         ])->withInput($request->only('email'));
     }
 
+    /**
+     * Show admin dashboard
+     */
     public function dashboard()
     {
         $totalProducts = Product::count();
@@ -65,11 +72,17 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('totalProducts', 'totalOrders', 'totalRevenue', 'products'));
     }
 
+    /**
+     * Show single product details (JSON)
+     */
     public function showProduct(Product $product)
     {
         return response()->json($product);
     }
 
+    /**
+     * Store a new product
+     */
     public function storeProduct(Request $request)
     {
         $request->validate([
@@ -88,16 +101,22 @@ class AdminController extends Controller
                 'category' => $request->category,
                 'price' => $request->price,
                 'quantity' => $request->quantity,
-                'stock_quantity' => 100, // Set default stock quantity
-                'image' => $request->input('image', ''), // Use input() with default value
+                'stock_quantity' => 100, // Default stock
+                'image' => $request->input('image', ''), // Default empty image
             ]);
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
+    /**
+     * Update an existing product
+     */
     public function updateProduct(Request $request, Product $product)
     {
         $request->validate([
@@ -116,28 +135,43 @@ class AdminController extends Controller
                 'category' => $request->category,
                 'price' => $request->price,
                 'quantity' => $request->quantity,
-                'image' => $request->input('image', ''), // Use input() with default value
-                // Keep existing stock_quantity unchanged during updates
+                'image' => $request->input('image', $product->image), // Keep old image if not changed
             ]);
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
+    /**
+     * Delete a product
+     */
     public function destroyProduct(Product $product)
     {
-        $product->delete();
-        return response()->json(['success' => true]);
+        try {
+            $product->delete();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    /**
+     * Logout the admin
+     */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect('/admin/login')->with('status', 'You have been logged out successfully.');
     }
 }

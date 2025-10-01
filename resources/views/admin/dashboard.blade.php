@@ -132,7 +132,7 @@
                                                     class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition duration-200">
                                                 Edit
                                             </button>
-                                            <button onclick="deleteProduct({{ $product->id }})" 
+                                            <button onclick="deleteProduct({{ $product->id }}, event)" 
                                                     class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition duration-200">
                                                 Delete
                                             </button>
@@ -158,7 +158,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Product</h3>
-                <form id="editProductForm" class="mt-4 text-left">
+                <form id="editProductForm" class="mt-4 text-left" onsubmit="submitEditProduct(event)">
                     @csrf
                     <input type="hidden" id="editProductId" name="product_id">
                     <div class="mb-4">
@@ -181,19 +181,15 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2">Quantity/Unit</label>
                         <input type="text" id="editProductQuantity" name="quantity" placeholder="e.g., 1 kg, 500 g, 1 L, 1 piece" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-green-500">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Image URL</label>
-                        <input type="url" id="editProductImage" name="image" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-green-500">
+                    <div class="items-center px-4 py-3">
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            Update Product
+                        </button>
+                        <button type="button" onclick="closeEditProductModal()" class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Cancel
+                        </button>
                     </div>
                 </form>
-                <div class="items-center px-4 py-3">
-                    <button onclick="submitEditProduct()" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        Update Product
-                    </button>
-                    <button onclick="closeEditProductModal()" class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                        Cancel
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -203,7 +199,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Add New Product</h3>
-                <form id="addProductForm" class="mt-4 text-left">
+                <form id="addProductForm" class="mt-4 text-left" onsubmit="submitAddProduct(event)">
                     @csrf
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Product Name</label>
@@ -225,19 +221,15 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2">Quantity/Unit</label>
                         <input type="text" name="quantity" placeholder="e.g., 1 kg, 500 g, 1 L, 1 piece" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-green-500">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Image URL</label>
-                        <input type="url" name="image" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-green-500">
+                    <div class="items-center px-4 py-3">
+                        <button type="submit" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                            Add Product
+                        </button>
+                        <button type="button" onclick="closeAddProductModal()" class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Cancel
+                        </button>
                     </div>
                 </form>
-                <div class="items-center px-4 py-3">
-                    <button onclick="submitAddProduct()" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
-                        Add Product
-                    </button>
-                    <button onclick="closeAddProductModal()" class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                        Cancel
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -252,7 +244,8 @@
             document.getElementById('addProductForm').reset();
         }
 
-        function submitAddProduct() {
+        function submitAddProduct(event) {
+            event.preventDefault();
             const form = document.getElementById('addProductForm');
             const formData = new FormData(form);
             
@@ -260,42 +253,56 @@
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
+                    closeAddProductModal();
                     location.reload();
                 } else {
-                    alert('Error adding product');
+                    throw new Error(data.message || 'Error adding product');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error adding product');
+                alert('Error adding product: ' + (error.message || 'Unknown error'));
             });
         }
 
         function editProduct(id) {
-            // Fetch product data and open edit modal
-            fetch('/admin/products/' + id)
-                .then(response => response.json())
-                .then(product => {
-                    document.getElementById('editProductId').value = product.id;
+            fetch('/admin/products/' + id, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(product => {
+                document.getElementById('editProductId').value = product.id;
                     document.getElementById('editProductName').value = product.name;
                     document.getElementById('editProductDescription').value = product.description;
                     document.getElementById('editProductCategory').value = product.category;
                     document.getElementById('editProductPrice').value = product.price;
                     document.getElementById('editProductQuantity').value = product.quantity || '';
-                    document.getElementById('editProductImage').value = product.image || '';
-                    
-                    document.getElementById('editProductModal').classList.remove('hidden');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error loading product data');
-                });
+                                    document.getElementById('editProductModal').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading product data: ' + (error.message || 'Unknown error'));
+            });
         }
 
         function closeEditProductModal() {
@@ -303,19 +310,17 @@
             document.getElementById('editProductForm').reset();
         }
 
-        function submitEditProduct() {
-            const form = document.getElementById('editProductForm');
-            const formData = new FormData(form);
+        function submitEditProduct(event) {
+            event.preventDefault();
             const productId = document.getElementById('editProductId').value;
             
-            // Convert FormData to regular object for PUT request
             const data = {
                 name: document.getElementById('editProductName').value,
                 description: document.getElementById('editProductDescription').value,
                 category: document.getElementById('editProductCategory').value,
                 price: document.getElementById('editProductPrice').value,
                 quantity: document.getElementById('editProductQuantity').value,
-                image: document.getElementById('editProductImage').value || ''
+                _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             };
             
             fetch('/admin/products/' + productId, {
@@ -323,12 +328,14 @@
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.json().then(err => { throw err; });
                 }
                 return response.json();
             })
@@ -337,37 +344,50 @@
                     closeEditProductModal();
                     location.reload();
                 } else {
-                    console.error('Server error:', data);
-                    alert('Error updating product: ' + (data.message || 'Unknown error'));
+                    throw new Error(data.message || 'Unknown error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error updating product: ' + error.message);
+                alert('Error updating product: ' + (error.message || 'Unknown error'));
             });
         }
 
-        function deleteProduct(id) {
-            if (confirm('Are you sure you want to delete this product?')) {
-                fetch('/admin/products/' + id, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting product');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error deleting product');
-                });
+        function deleteProduct(id, event) {
+            event.preventDefault();
+            if (!confirm('Are you sure you want to delete this product?')) {
+                return;
             }
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            fetch('/admin/products/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ _token: token })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting product: ' + (error.message || 'Unknown error'));
+            });
         }
     </script>
 </body>

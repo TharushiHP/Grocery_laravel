@@ -3,6 +3,16 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Health check endpoint for Railway
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now(),
+        'service' => 'Laravel Grocery Cart',
+        'database' => 'connected'
+    ]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | API Routes

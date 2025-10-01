@@ -6,6 +6,15 @@ use App\Livewire\AdminProductManager;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AdminController;
 
+// Health check endpoint for Railway
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now(),
+        'service' => 'Laravel Grocery Cart'
+    ]);
+});
+
 Route::get('/', ProductCatalog::class)->name('home');
 
 Route::get('/products', ProductCatalog::class)->name('products');

@@ -13,15 +13,28 @@ class AddAdvancedFieldsToPersonalAccessTokens extends Migration
      */
     public function up()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            $table->string('device_id')->nullable()->after('token');
-            $table->string('device_name')->nullable()->after('device_id');
-            $table->string('ip_address', 45)->nullable()->after('device_name');
-            $table->string('user_agent')->nullable()->after('ip_address');
-            $table->timestamp('expires_at')->nullable()->after('last_used_at');
-            $table->index(['device_id', 'device_name']);
-            $table->index('expires_at');
-        });
+        // Only run if the table exists
+        if (Schema::hasTable('personal_access_tokens')) {
+            Schema::table('personal_access_tokens', function (Blueprint $table) {
+                if (!Schema::hasColumn('personal_access_tokens', 'device_id')) {
+                    $table->string('device_id')->nullable()->after('token');
+                }
+                if (!Schema::hasColumn('personal_access_tokens', 'device_name')) {
+                    $table->string('device_name')->nullable()->after('device_id');
+                }
+                if (!Schema::hasColumn('personal_access_tokens', 'ip_address')) {
+                    $table->string('ip_address', 45)->nullable()->after('device_name');
+                }
+                if (!Schema::hasColumn('personal_access_tokens', 'user_agent')) {
+                    $table->string('user_agent')->nullable()->after('ip_address');
+                }
+                if (!Schema::hasColumn('personal_access_tokens', 'expires_at')) {
+                    $table->timestamp('expires_at')->nullable()->after('last_used_at');
+                }
+                $table->index(['device_id', 'device_name']);
+                $table->index('expires_at');
+            });
+        }
     }
 
     /**
@@ -31,14 +44,16 @@ class AddAdvancedFieldsToPersonalAccessTokens extends Migration
      */
     public function down()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            $table->dropColumn([
-                'device_id',
-                'device_name',
-                'ip_address',
-                'user_agent',
-                'expires_at'
-            ]);
-        });
+        if (Schema::hasTable('personal_access_tokens')) {
+            Schema::table('personal_access_tokens', function (Blueprint $table) {
+                $table->dropColumn([
+                    'device_id',
+                    'device_name',
+                    'ip_address',
+                    'user_agent',
+                    'expires_at'
+                ]);
+            });
+        }
     }
 }

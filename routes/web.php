@@ -73,63 +73,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/products/{product}', [AdminController::class, 'destroyProduct'])->name('admin.products.destroy');
 });
 
-// Demo Route to Show NoSQL and Sanctum Implementation
-Route::get('/demo-implementations', function () {
-    try {
-        $results = [];
-        
-        // 1. Test NoSQL (DocumentStore)
-        $store = app(\App\Services\DocumentStore::class);
-        
-        $demoDoc = [
-            'demo_type' => 'academic_showcase',
-            'features' => ['NoSQL', 'Document Storage', 'JSON Collections'],
-            'timestamp' => now()->toISOString(),
-            'message' => 'MongoDB-like functionality working!'
-        ];
-        
-        $stored = $store->store('academic_demo', $demoDoc);
-        $results['nosql'] = [
-            'status' => 'SUCCESS',
-            'implementation' => 'Custom DocumentStore Service (MongoDB-like)',
-            'document_id' => $stored['_id'],
-            'storage_location' => 'storage/app/documents/academic_demo/',
-            'features' => ['Flexible Schema', 'JSON Documents', 'Collections', 'CRUD Operations']
-        ];
-        
-        // 2. Test Sanctum API
-        $user = \App\Models\User::first();
-        if ($user) {
-            $token = $user->createToken('demo-showcase')->plainTextToken;
-            $results['sanctum'] = [
-                'status' => 'SUCCESS',
-                'implementation' => 'Laravel Sanctum API Authentication',
-                'token_generated' => substr($token, 0, 30) . '...',
-                'user' => $user->name,
-                'features' => ['Token Authentication', 'API Security', 'Protected Routes', 'Bearer Tokens']
-            ];
-        } else {
-            $results['sanctum'] = [
-                'status' => 'INFO',
-                'message' => 'Create a user first to test Sanctum tokens'
-            ];
-        }
-        
-        // 3. Show API endpoints
-        $results['api_endpoints'] = [
-            'nosql_demo' => url('/api/v1/nosql-test'),
-            'external_api_demo' => url('/api/v1/external-api-demo'),
-            'sanctum_register' => url('/api/v1/register'),
-            'sanctum_login' => url('/api/v1/login'),
-            'protected_profile' => url('/api/v1/profile')
-        ];
-        
-        return view('demo-implementations', compact('results'));
-        
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-})->name('demo.implementations');
 
 Route::middleware([
     'auth:sanctum',

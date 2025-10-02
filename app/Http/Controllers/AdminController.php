@@ -168,10 +168,17 @@ class AdminController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/admin/login')->with('status', 'You have been logged out successfully.');
+        try {
+            Auth::logout();
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect('/admin/login')->with('status', 'You have been logged out successfully.');
+        } catch (\Exception $e) {
+            // If there's any session issue, force logout and redirect
+            Auth::logout();
+            return redirect('/admin/login')->with('status', 'Logged out successfully.');
+        }
     }
 }

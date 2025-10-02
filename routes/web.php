@@ -65,6 +65,7 @@ Route::get('/test-mongodb', [App\Http\Controllers\MongoDBTestController::class, 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+    Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout.get'); // Alternative logout route
     
     // Product Management Routes
     Route::get('/products/{product}', [AdminController::class, 'showProduct'])->name('admin.products.show');

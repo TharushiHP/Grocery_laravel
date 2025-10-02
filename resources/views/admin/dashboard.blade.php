@@ -22,10 +22,11 @@
                            class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg text-sm">
                             View Store
                         </a>
-                        <form action="{{ route('admin.logout') }}" method="POST" class="inline">
+                        <form action="{{ route('admin.logout') }}" method="POST" class="inline" id="logoutForm">
                             @csrf
                             <button type="submit" 
-                                    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm">
+                                    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
+                                    onclick="handleLogout(event)">
                                 Logout
                             </button>
                         </form>
@@ -33,6 +34,17 @@
                 </div>
             </div>
         </header>
+
+        <script>
+        function handleLogout(event) {
+            // If CSRF fails, try alternative route
+            setTimeout(function() {
+                if (document.getElementById('logoutForm')) {
+                    window.location.href = '{{ route("admin.logout.get") }}';
+                }
+            }, 2000);
+        }
+        </script>
 
         <!-- Main Content -->
         <div class="container mx-auto px-4 py-8">

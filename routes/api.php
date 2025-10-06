@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CategoryController;
 
 // Health check endpoint for Railway
 Route::get('/health', function () {
@@ -73,6 +74,17 @@ Route::prefix('products')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Category Routes (Public)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('categories')->group(function () {
+    // Public category routes (no authentication required)
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::get('/{id}', [CategoryController::class, 'show']);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Protected Routes (Require Authentication)
 |--------------------------------------------------------------------------
 */
@@ -93,6 +105,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ProductController::class, 'store']);
         Route::put('/{id}', [ProductController::class, 'update']);
         Route::delete('/{id}', [ProductController::class, 'destroy']);
+    });
+    
+    // Admin Category Management Routes (Optional)
+    Route::prefix('admin/categories')->group(function () {
+        Route::post('/', [CategoryController::class, 'store']);
+        Route::put('/{id}', [CategoryController::class, 'update']);
+        Route::delete('/{id}', [CategoryController::class, 'destroy']);
     });
     
     // Cart-related routes can be added here if needed
@@ -117,11 +136,13 @@ Route::fallback(function() {
             'GET /api/auth/user' => 'Get authenticated user (requires auth)',
             'PUT /api/auth/profile' => 'Update user profile (requires auth)',
             'GET /api/products' => 'Get all products',
-            'GET /api/products/categories' => 'Get all categories',
+            'GET /api/products/categories' => 'Get all product categories',
             'GET /api/products/category/{category}' => 'Get products by category',
             'GET /api/products/search' => 'Search products',
             'GET /api/products/featured' => 'Get featured products',
             'GET /api/products/{id}' => 'Get specific product',
+            'GET /api/categories' => 'Get all categories',
+            'GET /api/categories/{id}' => 'Get specific category',
         ]
     ], 404);
 });

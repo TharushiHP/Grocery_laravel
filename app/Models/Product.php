@@ -19,6 +19,7 @@ class Product extends Model
         'description',
         'price',
         'category',
+        'category_id',
         'quantity',
         'image',
     ];
@@ -38,6 +39,14 @@ class Product extends Model
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);
+    }
+
+    /**
+     * Get the category that owns the product.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     /**

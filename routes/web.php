@@ -57,10 +57,6 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminController::class, 'login']);
 });
 
-// MongoDB Test Route
-Route::get('/test-mongodb', [App\Http\Controllers\MongoDBTestController::class, 'testConnection'])
-    ->name('test.mongodb');
-
 // Protected Admin Routes (require admin authentication)
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');

@@ -11,13 +11,13 @@ echo "Database: $DB_CONNECTION"
 echo "Host: $DB_HOST"
 echo "Port: $PORT"
 
-# Wait for database connection
-echo "Waiting for database connection..."
-for i in {1..30}; do
-    if php artisan migrate:status > /dev/null 2>&1; then
-        echo "Database connection successful!"
-        break
-    fi
+# Try to run migrations but don't fail if database isn't ready
+echo "Attempting database migrations..."
+if php artisan migrate --force > /dev/null 2>&1; then
+    echo "Database migrations completed successfully!"
+else
+    echo "Warning: Database migrations failed or database not ready. Continuing without migrations."
+fi
     echo "Waiting for database... attempt $i/30"
     sleep 2
 done

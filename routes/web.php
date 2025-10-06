@@ -8,14 +8,23 @@ use App\Http\Controllers\AdminController;
 
 // Health check endpoint for Railway
 Route::get('/health', function () {
-    return response()->json([
-        'status' => 'ok',
-        'timestamp' => now(),
-        'service' => 'Laravel Grocery Cart',
-        'php_version' => PHP_VERSION,
-        'laravel_version' => app()->version(),
-        'deployment_time' => 'October 2, 2025 - Database connected'
-    ]);
+    try {
+        // Basic health check without database dependency
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => now(),
+            'service' => 'Laravel Grocery Cart',
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
+            'memory_usage' => memory_get_usage(true),
+            'deployment_time' => 'October 6, 2025 - API Ready'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
 });
 
 // Database health check (separate endpoint)
